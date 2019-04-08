@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="StorageScene" prefHeight="400.0" prefWidth="600.0"
+      xmlns="http://javafx.com/javafx/8.0.172-ea" fx:controller="sample.StorageController">
+    <HBox alignment="CENTER">
+        <ListView fx:id="localStorageListView" HBox.hgrow="ALWAYS"/>
+        <ListView fx:id="cloudStorageListView" HBox.hgrow="ALWAYS"/>
+    </HBox>
+    <HBox>
+        <Button text="add" HBox.hgrow="ALWAYS"/>
+        <Button text="delete"/>
+        <Button text="upgrade"/>
+        <Button text="download"/>
+        <Button text="upgrade" HBox.hgrow="ALWAYS"/>
+    </HBox>
+</VBox>
