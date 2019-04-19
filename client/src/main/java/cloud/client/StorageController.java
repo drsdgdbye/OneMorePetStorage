@@ -3,7 +3,9 @@ package cloud.client;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextField;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -13,7 +15,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class StorageController {
     @FXML
-    Button sendFiles;
+    TextField search;
+
+    @FXML
+    Button sendFile;
 
     @FXML
     ListView<Path> localStorageListView;
@@ -25,8 +30,19 @@ public class StorageController {
     Button upgradeLocalStorage;
 
 
-    public void sendFiles() {
-
+    public void sendFile() {
+        try {
+            /*Main.out.write("file".getBytes());
+            Main.out.flush();
+            Main.out.write(LoginController.userPath.getFileName().toString().getBytes());
+            Main.out.flush();*/
+            FileInputStream fin = new FileInputStream(LoginController.userPath.toString() + "photo1.jpg");
+            byte[] buf = new byte[fin.available()];
+            fin.read(buf);
+            Main.out.write(buf);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void upgradeLocalStorage() {

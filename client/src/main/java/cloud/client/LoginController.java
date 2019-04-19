@@ -9,33 +9,21 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SocketChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class LoginController {
-    static Path userPath;
     @FXML
     Button createUser;
     @FXML
     private TextField login;
-    @FXML
-    private PasswordField password;
+    static Path userPath;
     @FXML
     private Button authorization;
-    private InetSocketAddress hostAddress;
-    private SocketChannel clientSocket;
-
-    public void startClient() throws IOException {
-        hostAddress = new InetSocketAddress("localhost", 8189);
-        clientSocket = SocketChannel.open(hostAddress);
-        if (clientSocket.isConnected()) {
-            System.out.println("client started");
-        }
-    }
+    @FXML
+    private PasswordField pass;
 
     private void changeScene() throws IOException {
         Stage stage = (Stage) authorization.getScene().getWindow();
@@ -50,30 +38,34 @@ public class LoginController {
     }
 
     public void tryToAuth() throws IOException {
-        if (login.getText().equals("login") && password.getText().equals("pass")) {
+        /*byte[] buf = (login.getText() + " " + pass.getText()).getBytes();
+        Main.out.write(buf);
+        Main.out.flush();
+        createUser(login.getText());*/
+        checkData();
+        userPath = Files.createDirectories(Paths.get(".", "users", "login"));
+
+    }
+
+    private void checkData() throws IOException {
+        if (login.getText().isEmpty() || pass.getText().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Fill login/password", ButtonType.OK);
+            alert.showAndWait();
+        } else {
             changeScene();
         }
     }
 
-    public void createUser() {
-        if (login.getText().isEmpty() || password.getText().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Fill login/password", ButtonType.OK);
-            alert.showAndWait();
-        } else {
-            createNewUserFolder(login.getText());
-        }
-    }
-
-    private void createNewUserFolder(String username) {
+    public void createUser() throws IOException {
+        checkData();
         try {
-            startClient();
-            userPath = Files.createDirectory(Paths.get(".\\users\\" + username));
+            userPath = Files.createDirectories(Paths.get(".", "users", login.getText()));
             changeScene();
         } catch (FileAlreadyExistsException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "User already exists", ButtonType.OK);
             alert.showAndWait();
             login.clear();
-            password.clear();
+            pass.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
