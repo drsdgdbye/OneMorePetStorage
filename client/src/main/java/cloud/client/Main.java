@@ -8,22 +8,31 @@ import javafx.stage.Stage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.net.Socket;
+import java.io.IOException;
 
 public class Main extends Application {
-    static DataInputStream in;
-    static DataOutputStream out;
-    private Socket socket;
+    public static DataInputStream in;
+    public static DataOutputStream out;
+    public static Network network;
 
-    /*public Main() {
+    public Main() {
         try {
-            socket = new Socket("localhost", 8189);
-            in = new DataInputStream(socket.getInputStream());
-            out = new DataOutputStream(socket.getOutputStream());
+            network = new Network();
+            network.start();
+            in = new DataInputStream(network.getSocket().getInputStream());
+            out = new DataOutputStream(network.getSocket().getOutputStream());
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }*/
+        } /*finally {
+            try {
+                in.close();
+                out.close();
+            } catch (IOException ignored) {}
+            if (network != null) {
+                network.stop();
+            }
+        }*/
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -32,7 +41,6 @@ public class Main extends Application {
         primaryStage.setScene(new Scene(root, 400, 400));
         primaryStage.show();
     }
-
 
     public static void main(String[] args) {
         launch(args);

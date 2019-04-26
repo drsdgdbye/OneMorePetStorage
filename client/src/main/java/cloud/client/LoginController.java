@@ -1,5 +1,7 @@
 package cloud.client;
 
+import cloud.client.decoders.CommandDecoder;
+import cloud.client.encoders.CommandEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,11 +17,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class LoginController {
+    static Path userPath;
     @FXML
     Button createUser;
     @FXML
     private TextField login;
-    static Path userPath;
     @FXML
     private Button authorization;
     @FXML
@@ -37,30 +39,37 @@ public class LoginController {
         stage.show();
     }
 
-    public void tryToAuth() throws IOException {
-        /*byte[] buf = (login.getText() + " " + pass.getText()).getBytes();
-        Main.out.write(buf);
-        Main.out.flush();
-        createUser(login.getText());*/
-        checkData();
-        userPath = Files.createDirectories(Paths.get(".", "users", "login"));
-
-    }
-
-    private void checkData() throws IOException {
-        if (login.getText().isEmpty() || pass.getText().isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING, "Fill login/password", ButtonType.OK);
-            alert.showAndWait();
-        } else {
+    private void setAuthorized(String response) throws IOException {
+        if (response.equals("/authok")) {
             changeScene();
         }
     }
 
-    public void createUser() throws IOException {
+    public void signUp() {
         checkData();
+        createUserDirectory(login.getText());
+    }
+
+    public void tryToAuth() throws IOException {
+        checkData();
+        Main.out.write(new CommandEncoder("/login").encode(login.getText(), pass.getText()));
+        Main.out.flush();
+        setAuthorized(new CommandDecoder().decode());
+        userPath = Paths.get(".", "users", "login");
+    }
+
+    private void checkData() {
+        if (login.getText().isEmpty() || pass.getText().isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Fill login/password", ButtonType.OK);
+            alert.showAndWait();
+            login.clear();
+            pass.clear();
+        }
+    }
+
+    private void createUserDirectory(String username) {
         try {
-            userPath = Files.createDirectories(Paths.get(".", "users", login.getText()));
-            changeScene();
+            userPath = Files.createDirectories(Paths.get(".", "users", username));
         } catch (FileAlreadyExistsException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "User already exists", ButtonType.OK);
             alert.showAndWait();
@@ -70,4 +79,5 @@ public class LoginController {
             e.printStackTrace();
         }
     }
+
 }

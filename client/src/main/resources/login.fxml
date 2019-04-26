@@ -23,7 +23,7 @@
         <VBox.margin>
             <Insets top="10.0"/>
         </VBox.margin>
-        <Button fx:id="authorization" onAction="#tryToAuth" prefWidth="100" text="Authorization">
+        <Button fx:id="authorization" onAction="#tryToAuth" prefWidth="100" text="Sign in">
             <opaqueInsets>
                 <Insets/>
             </opaqueInsets>
@@ -31,7 +31,7 @@
                 <Insets right="10.0"/>
             </HBox.margin>
         </Button>
-        <Button fx:id="createUser" onAction="#createUser" prefWidth="100" text="New">
+        <Button fx:id="createUser" onAction="#signUp" prefWidth="100" text="Sign up">
         </Button>
     </HBox>
 </VBox>

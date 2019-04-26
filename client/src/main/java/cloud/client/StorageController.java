@@ -1,10 +1,10 @@
 package cloud.client;
 
+import cloud.client.encoders.CommandEncoder;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -15,41 +15,48 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 public class StorageController {
     @FXML
-    TextField search;
-
-    @FXML
-    Button sendFile;
-
-    @FXML
     ListView<Path> localStorageListView;
 
     @FXML
+    TextField search;
+    @FXML
     ListView<Path> cloudStorageListView;
+    @FXML
+    Button updateLocalStorage;
 
     @FXML
-    Button upgradeLocalStorage;
-
+    Button sendFile;
+    private Path userPath = LoginController.userPath;
 
     public void sendFile() {
+        String selectedFile = localStorageListView.getSelectionModel().getSelectedItems().toString();
         try {
-            /*Main.out.write("file".getBytes());
-            Main.out.flush();
-            Main.out.write(LoginController.userPath.getFileName().toString().getBytes());
-            Main.out.flush();*/
-            FileInputStream fin = new FileInputStream(LoginController.userPath.toString() + "photo1.jpg");
-            byte[] buf = new byte[fin.available()];
-            fin.read(buf);
-            Main.out.write(buf);
+            if (selectedFile != null) { //if no file is selected from localStorageListView an exception will be thrown
+                Main.out.write(new CommandEncoder("/file").encode(userPath.getFileName().toString()));
+                Main.out.flush();
+                FileInputStream fileInputStream = new FileInputStream(userPath.toString()
+                        + File.separator
+                        + selectedFile);
+                byte[] buffer = new byte[1024];
+                while (true) {
+                    int countBytes = fileInputStream.read(buffer);
+                    if (countBytes != -1) {
+                        Main.out.write(buffer, 0, countBytes);
+                    } else break;
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING, "Choose File", ButtonType.OK);
+                alert.showAndWait();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void upgradeLocalStorage() {
-        Path upgradePath = LoginController.userPath;
+    public void updateLocalStorage() {
         try {
             localStorageListView.getItems().clear();
-            Files.walkFileTree(upgradePath, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(userPath, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     localStorageListView.getItems().add(file.getFileName());

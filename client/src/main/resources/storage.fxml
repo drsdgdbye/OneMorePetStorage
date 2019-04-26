@@ -20,8 +20,8 @@
     <HBox spacing="5.0">
         <Button fx:id="sendFile" maxWidth="Infinity" onAction="#sendFile" text="add" HBox.hgrow="ALWAYS"/>
         <Button maxWidth="Infinity" text="delete" HBox.hgrow="ALWAYS"/>
-        <Button fx:id="upgradeLocalStorage" maxWidth="Infinity" text="upgrade" HBox.hgrow="ALWAYS"
-                onAction="#upgradeLocalStorage"/>
+        <Button fx:id="updateLocalStorage" maxWidth="Infinity" text="upgrade" HBox.hgrow="ALWAYS"
+                onAction="#updateLocalStorage"/>
         <Button maxWidth="Infinity" text="download" HBox.hgrow="ALWAYS"/>
         <padding>
             <Insets bottom="3.0" left="3.0" right="3.0"/>
