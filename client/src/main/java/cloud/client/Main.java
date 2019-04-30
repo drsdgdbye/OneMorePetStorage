@@ -6,40 +6,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
 public class Main extends Application {
-    public static DataInputStream in;
-    public static DataOutputStream out;
-    public static Network network;
+
 
     public Main() {
-        try {
-            network = new Network();
-            network.start();
-            in = new DataInputStream(network.getSocket().getInputStream());
-            out = new DataOutputStream(network.getSocket().getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } /*finally {
-            try {
-                in.close();
-                out.close();
-            } catch (IOException ignored) {}
-            if (network != null) {
-                network.stop();
-            }
-        }*/
+        Network.start();
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
-        primaryStage.setTitle("Authorization");
-        primaryStage.setScene(new Scene(root, 400, 400));
+        Parent root = FXMLLoader.load(getClass().getResource("/storage.fxml"));
+        primaryStage.setTitle("One More Pet Cloud");
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        primaryStage.setOnCloseRequest(we -> Network.stop());
     }
 
     public static void main(String[] args) {

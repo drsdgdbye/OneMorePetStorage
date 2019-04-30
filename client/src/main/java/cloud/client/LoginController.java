@@ -1,7 +1,5 @@
 package cloud.client;
 
-import cloud.client.decoders.CommandDecoder;
-import cloud.client.encoders.CommandEncoder;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -51,11 +49,11 @@ public class LoginController {
     }
 
     public void tryToAuth() throws IOException {
-        checkData();
+       /* checkData();
         Main.out.write(new CommandEncoder("/login").encode(login.getText(), pass.getText()));
         Main.out.flush();
         setAuthorized(new CommandDecoder().decode());
-        userPath = Paths.get(".", "users", "login");
+        userPath = Paths.get(".", "users", "login");*/
     }
 
     private void checkData() {

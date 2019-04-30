@@ -1,70 +1,72 @@
 package cloud.client;
 
-import cloud.client.encoders.CommandEncoder;
+import cloud.common.FileMsg;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ListView;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 
 public class StorageController {
+    private final Path USERPATH = Paths.get(".", "users", "user"); //будет браться из login.getText()
     @FXML
-    ListView<Path> localStorageListView;
-
+    ListView<String> localStorageListView;
     @FXML
-    TextField search;
-    @FXML
-    ListView<Path> cloudStorageListView;
+    ListView<String> cloudStorageListView;
     @FXML
     Button updateLocalStorage;
 
     @FXML
     Button sendFile;
-    private Path userPath = LoginController.userPath;
+    @FXML
+    Button upgradeCloudStorage;
 
-    public void sendFile() {
-        String selectedFile = localStorageListView.getSelectionModel().getSelectedItems().toString();
-        try {
-            if (selectedFile != null) { //if no file is selected from localStorageListView an exception will be thrown
-                Main.out.write(new CommandEncoder("/file").encode(userPath.getFileName().toString()));
-                Main.out.flush();
-                FileInputStream fileInputStream = new FileInputStream(userPath.toString()
-                        + File.separator
-                        + selectedFile);
-                byte[] buffer = new byte[1024];
-                while (true) {
-                    int countBytes = fileInputStream.read(buffer);
-                    if (countBytes != -1) {
-                        Main.out.write(buffer, 0, countBytes);
-                    } else break;
-                }
-            } else {
-                Alert alert = new Alert(Alert.AlertType.WARNING, "Choose File", ButtonType.OK);
-                alert.showAndWait();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    public void sendFile() throws IOException {
+        String selectedFile = localStorageListView.getFocusModel().getFocusedItem();
+        if (selectedFile != null) {
+            FileMsg file = new FileMsg(Paths.get(USERPATH + File.separator + selectedFile));
+            Network.sendFile("ADD", file);
+            Network.readStringMsg();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Choose File", ButtonType.OK);
+            alert.showAndWait();
         }
     }
 
     public void updateLocalStorage() {
         try {
             localStorageListView.getItems().clear();
-            Files.walkFileTree(userPath, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(USERPATH, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                    localStorageListView.getItems().add(file.getFileName());
+                    localStorageListView.getItems().add(file.getFileName().toString());
                     return FileVisitResult.CONTINUE;
                 }
             });
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void upgradeCloudStorage() throws IOException {
+        Network.sendMsg("UPG");
+        cloudStorageListView.getItems().clear();
+        cloudStorageListView.getItems().add(Network.readStringMsg());
+    }
+
+    public void downloadFile() throws IOException {
+        String selectedFile = cloudStorageListView.getFocusModel().getFocusedItem();
+        if (selectedFile != null) {
+            Network.sendMsg("DWN", selectedFile);
+            //add file reception
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Choose File", ButtonType.OK);
+            alert.showAndWait();
         }
     }
 }

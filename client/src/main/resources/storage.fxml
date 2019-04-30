@@ -5,11 +5,6 @@
 <?import javafx.scene.layout.*?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" prefHeight="400.0" prefWidth="600.0"
       xmlns="http://javafx.com/javafx/8.0.121" fx:controller="cloud.client.StorageController">
-    <TextField fx:id="search" promptText="search...">
-        <VBox.margin>
-            <Insets left="3.0" right="3.0" top="3.0"/>
-        </VBox.margin>
-    </TextField>
     <HBox alignment="CENTER" spacing="3.0" VBox.vgrow="ALWAYS">
         <ListView fx:id="localStorageListView" HBox.hgrow="ALWAYS"/>
         <ListView fx:id="cloudStorageListView" HBox.hgrow="ALWAYS"/>
@@ -20,9 +15,12 @@
     <HBox spacing="5.0">
         <Button fx:id="sendFile" maxWidth="Infinity" onAction="#sendFile" text="add" HBox.hgrow="ALWAYS"/>
         <Button maxWidth="Infinity" text="delete" HBox.hgrow="ALWAYS"/>
-        <Button fx:id="updateLocalStorage" maxWidth="Infinity" text="upgrade" HBox.hgrow="ALWAYS"
+        <Button fx:id="updateLocalStorage" maxWidth="Infinity" text="update" HBox.hgrow="ALWAYS"
                 onAction="#updateLocalStorage"/>
         <Button maxWidth="Infinity" text="download" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="upgradeCloudStorage" maxWidth="Infinity" text="upgrade" HBox.hgrow="ALWAYS"
+                onAction="#upgradeCloudStorage"/>
+        <Button fx:id="downloadFile" onAction="#downloadFile" maxWidth="Infinity" text="download" HBox.hgrow="ALWAYS"/>
         <padding>
             <Insets bottom="3.0" left="3.0" right="3.0"/>
         </padding>

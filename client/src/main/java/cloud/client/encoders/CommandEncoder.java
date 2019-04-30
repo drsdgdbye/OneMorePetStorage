@@ -5,20 +5,21 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CommandEncoder {
-    private String command;
+    private String tag;
     private List<String> bodyList;
 
-    public CommandEncoder(String command) {
-        this.command = command;
+    public CommandEncoder(String tag) {
+        this.tag = tag;
         bodyList = new ArrayList<>();
     }
 
-    public byte[] encode(String... body) {
+
+    public byte[] wrapToBytes(String... body) {
         StringBuilder builder = new StringBuilder();
-        bodyList.add(command);
+        bodyList.add(tag);
         bodyList.addAll(Arrays.asList(body));
         for (String s : bodyList) {
-            builder.append(s).append(" ");
+            builder.append(s).append("\n");
         }
         return builder.toString().getBytes();
     }
