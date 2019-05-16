@@ -1,12 +1,9 @@
 package cloud.client;
 
-import cloud.client.encoders.CommandEncoder;
-import cloud.common.FileMsg;
-
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 class Network {
     private static final String HOST = "localhost";
@@ -28,21 +25,26 @@ class Network {
         }
     }
 
-    static void sendMsg(String tag, String... body) {
+    static void sendMsg(String... body) {
         try {
-            out.write(new CommandEncoder(tag).wrapToBytes(body));
+            out.write(wrapToBytes(body));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    static void sendFile(String tag, FileMsg file) {
+    static void sendFile(String tag, File file) {
         try {
-            out.write(new CommandEncoder(tag).wrapToBytes(file.getFileName()));
+            out.write(wrapToBytes(tag, file.getName()));
             out.flush();
-            out.write(file.getData());
-            out.flush();
-            out.write("\n".getBytes());
+            FileInputStream fis = new FileInputStream(file);
+            byte[] buffer = new byte[1024 * 1024 * 8];
+            int count;
+            while ((count = fis.read(buffer)) > 0) {
+                out.write(buffer, 0, count);
+            }
+            fis.close();
+            out.writeBytes("\n");
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -58,25 +60,30 @@ class Network {
         return builder.toString();
     }
 
+    private static byte[] wrapToBytes(String... body) {
+        StringBuilder builder = new StringBuilder();
+        ArrayList<String> bodyList = new ArrayList<>(Arrays.asList(body));
+        for (String s : bodyList) {
+            builder.append(s).append("\n");
+        }
+        return builder.toString().getBytes();
+    }
+
     static void stop() {
-        if (in != null) {
-            try {
-                in.close();
-            } catch (IOException ignored) {
-            }
+        try {
+            in.close();
+        } catch (IOException ignored) {
         }
-        if (out != null) {
-            try {
-                out.flush();
-                out.close();
-            } catch (IOException ignored) {
-            }
+
+        try {
+            out.flush();
+            out.close();
+        } catch (IOException ignored) {
         }
-        if (!socket.isClosed()) {
-            try {
-                socket.close();
-            } catch (IOException ignored) {
-            }
+
+        try {
+            socket.close();
+        } catch (IOException ignored) {
         }
     }
 }

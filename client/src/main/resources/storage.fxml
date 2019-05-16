@@ -14,10 +14,12 @@
     </HBox>
     <HBox spacing="5.0">
         <Button fx:id="sendFile" maxWidth="Infinity" onAction="#sendFile" text="add" HBox.hgrow="ALWAYS"/>
-        <Button maxWidth="Infinity" text="delete" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="deleteLocalFile" onAction="#deleteLocalFile" maxWidth="Infinity" text="delete"
+                HBox.hgrow="ALWAYS"/>
         <Button fx:id="updateLocalStorage" maxWidth="Infinity" text="update" HBox.hgrow="ALWAYS"
                 onAction="#updateLocalStorage"/>
-        <Button maxWidth="Infinity" text="download" HBox.hgrow="ALWAYS"/>
+        <Button fx:id="deleteCloudFile" onAction="#deleteCloudFile" maxWidth="Infinity" text="delete"
+                HBox.hgrow="ALWAYS"/>
         <Button fx:id="upgradeCloudStorage" maxWidth="Infinity" text="upgrade" HBox.hgrow="ALWAYS"
                 onAction="#upgradeCloudStorage"/>
         <Button fx:id="downloadFile" onAction="#downloadFile" maxWidth="Infinity" text="download" HBox.hgrow="ALWAYS"/>
