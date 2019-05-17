@@ -49,11 +49,7 @@ public class LoginController {
     }
 
     public void tryToAuth() throws IOException {
-       /* checkData();
-        Main.out.write(new CommandEncoder("/login").encode(login.getText(), pass.getText()));
-        Main.out.flush();
-        setAuthorized(new CommandDecoder().decode());
-        userPath = Paths.get(".", "users", "login");*/
+
     }
 
     private void checkData() {

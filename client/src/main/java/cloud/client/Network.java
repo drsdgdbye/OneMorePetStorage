@@ -35,7 +35,10 @@ class Network {
 
     static void sendFile(String tag, File file) {
         try {
-            out.write(wrapToBytes(tag, file.getName()));
+            String fileNameLength = String.format("%02d", file.getName().length());
+            String fileLength = String.format("%011d", file.length()); // непонятны точные длины
+
+            out.write(wrapToBytes(tag, fileNameLength, file.getName(), fileLength));
             out.flush();
             FileInputStream fis = new FileInputStream(file);
             byte[] buffer = new byte[1024 * 1024 * 8];
@@ -44,7 +47,6 @@ class Network {
                 out.write(buffer, 0, count);
             }
             fis.close();
-            out.writeBytes("\n");
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();
@@ -64,7 +66,7 @@ class Network {
         StringBuilder builder = new StringBuilder();
         ArrayList<String> bodyList = new ArrayList<>(Arrays.asList(body));
         for (String s : bodyList) {
-            builder.append(s).append("\n");
+            builder.append(s);
         }
         return builder.toString().getBytes();
     }
