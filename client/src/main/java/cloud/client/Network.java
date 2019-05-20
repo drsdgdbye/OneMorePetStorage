@@ -25,7 +25,7 @@ class Network {
         }
     }
 
-    static void sendMsg(String... body) {
+    static void sendRequest(String... body) {
         try {
             out.write(wrapToBytes(body));
         } catch (IOException e) {
@@ -36,12 +36,12 @@ class Network {
     static void sendFile(String tag, File file) {
         try {
             String fileNameLength = String.format("%02d", file.getName().length());
-            String fileLength = String.format("%011d", file.length()); // непонятны точные длины
+            String fileLength = String.format("%011d", file.length());
 
             out.write(wrapToBytes(tag, fileNameLength, file.getName(), fileLength));
             out.flush();
             FileInputStream fis = new FileInputStream(file);
-            byte[] buffer = new byte[1024 * 1024 * 8];
+            byte[] buffer = new byte[1024 * 1024 * 10];
             int count;
             while ((count = fis.read(buffer)) > 0) {
                 out.write(buffer, 0, count);

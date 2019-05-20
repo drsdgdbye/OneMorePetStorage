@@ -1,6 +1,6 @@
 package cloud.server;
 
-import cloud.server.serverHandlers.FileServerHandler;
+import cloud.server.serverHandlers.FileAcceptorServerHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -22,7 +22,7 @@ class Server {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             socketChannel.pipeline().addLast(
-                                    new FileServerHandler());
+                                    new FileAcceptorServerHandler());
                         }
                     })
                     .childOption(ChannelOption.SO_KEEPALIVE, true);

@@ -3,39 +3,38 @@ package cloud.server.serverHandlers;
 import cloud.common.Command;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 
-public class FileServerHandler extends ChannelInboundHandlerAdapter {
+public class FileAcceptorServerHandler extends ChannelInboundHandlerAdapter {
+    //TODO userpath сделать отдельной переменной на сервере. пользовательская папка из loginhandler
     private final Path USERPATH = Paths.get(".", "serverUsers", "user");
     private ByteBuf accumulator;
-    private String tag;
-    private State state;
     private int fileNameLength;
     private String fileName;
     private long fileLength;
+    private State state = State.READTAG;
 
-    //зарелизить msg
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf in = (ByteBuf) msg;
-        state = State.READTAG;
+        String tag;
 
-        if (in.readableBytes() < 3) {
-            return;
-        } else {
-            tag = in.readSlice(3).toString(StandardCharsets.UTF_8);
-            if (tag.equals(Command.ADD.getTag())) {
-                state = State.READFILENAMELENGTH;
-            } else {
-                ctx.fireChannelRead(msg);
+        if (in.readableBytes() >= 3) {
+            if (state == State.READTAG) {
+                tag = in.readSlice(3).toString(StandardCharsets.UTF_8);
+                if (tag.equals(Command.ADD.getTag())) {
+                    System.out.println(tag);
+                    state = State.READFILENAMELENGTH;
+                } else {
+                    ctx.fireChannelRead(msg);
+                }
             }
         }
 
@@ -67,13 +66,19 @@ public class FileServerHandler extends ChannelInboundHandlerAdapter {
             Path pathFile = Paths.get(USERPATH.toString(), fileName);
             long downloadCount = fileLength;
             accumulator.writeBytes(in);
-            Files.write(pathFile, ByteBufUtil.getBytes(accumulator), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            accumulator.clear();
             in.release();
-            downloadCount -= ByteBufUtil.getBytes(accumulator).length;
-            System.out.println(downloadCount);
-            if (downloadCount == 0) {
-                state = State.READTAG;
+            try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(pathFile.toString(), true))) {
+                while (accumulator.readableBytes() > 0) {
+                    out.write(accumulator.readByte());
+                    downloadCount--;
+                    if (downloadCount == 0) {
+                        state = State.READTAG;
+                        break;
+                    }
+                }
+                accumulator.clear();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
@@ -90,7 +95,6 @@ public class FileServerHandler extends ChannelInboundHandlerAdapter {
         READFILENAME,
         READFILELENGTH,
         READFILE
-
     }
 
     @Override

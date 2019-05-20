@@ -18,7 +18,6 @@ public class StorageController {
     ListView<String> cloudStorageListView;
     @FXML
     Button updateLocalStorage;
-    private final Path USERPATH = Paths.get(".", "users", "user"); //будет браться из login.getText()
     @FXML
     Button sendFile;
     @FXML
@@ -26,10 +25,12 @@ public class StorageController {
     @FXML
     Button deleteLocalFile;
 
+    private final Path USERPATH = Paths.get(".", "users", "user"); //будет браться из login.getText()
+
     public void sendFile() throws IOException {
-        String selectedLocalFile = localStorageListView.getFocusModel().getFocusedItem();
-        if (selectedLocalFile != null) {
-            Path filePath = Paths.get(USERPATH.toString(), selectedLocalFile);
+        String selectedLocalFileName = localStorageListView.getFocusModel().getFocusedItem();
+        if (selectedLocalFileName != null) {
+            Path filePath = Paths.get(USERPATH.toString(), selectedLocalFileName);
             Network.sendFile(Command.ADD.getTag(), filePath.toFile());
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Choose File", ButtonType.OK);
@@ -53,15 +54,16 @@ public class StorageController {
     }
 
     public void upgradeCloudStorage() throws IOException {
-        Network.sendMsg(Command.UPGRADE.getTag());
+        Network.sendRequest(Command.UPGRADE.getTag());
         cloudStorageListView.getItems().clear();
         cloudStorageListView.getItems().add(Network.readStringMsg());
     }
 
     public void downloadFile() throws IOException {
-        String selectedCloudFile = cloudStorageListView.getFocusModel().getFocusedItem();
-        if (selectedCloudFile != null) {
-            Network.sendMsg(Command.DOWNLOAD.getTag(), selectedCloudFile);
+        String selectedCloudFileName = cloudStorageListView.getFocusModel().getFocusedItem();
+        String selectedCloudFileNameLength = String.format("%02d", selectedCloudFileName.length());
+        if (selectedCloudFileName != null) {
+            Network.sendRequest(Command.DOWNLOAD.getTag(), selectedCloudFileNameLength, selectedCloudFileName);
             //add file reception
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Choose File", ButtonType.OK);
@@ -70,8 +72,8 @@ public class StorageController {
     }
 
     public void deleteLocalFile() {
-        String selectedLocalFile = localStorageListView.getFocusModel().getFocusedItem();
-        Path deletePath = Paths.get(USERPATH.toString(), selectedLocalFile);
+        String selectedLocalFileName = localStorageListView.getFocusModel().getFocusedItem();
+        Path deletePath = Paths.get(USERPATH.toString(), selectedLocalFileName);
         try {
             Files.delete(deletePath);
             updateLocalStorage();
@@ -81,8 +83,14 @@ public class StorageController {
     }
 
     public void deleteCloudFile() throws IOException {
-        String selectedCloudFile = cloudStorageListView.getFocusModel().getFocusedItem();
-        Network.sendMsg(Command.DELETE.getTag(), selectedCloudFile);
-        upgradeCloudStorage();
+        String selectedCloudFileName = cloudStorageListView.getFocusModel().getFocusedItem();
+        String selectedCloudFileNameLength = String.format("%02d", selectedCloudFileName.length());
+        if (selectedCloudFileName != null) {
+            Network.sendRequest(Command.DELETE.getTag(), selectedCloudFileNameLength, selectedCloudFileName);
+            upgradeCloudStorage();
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Choose File", ButtonType.OK);
+            alert.showAndWait();
+        }
     }
 }
