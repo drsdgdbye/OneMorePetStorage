@@ -13,13 +13,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileAcceptorServerHandler extends ChannelInboundHandlerAdapter {
-    //TODO userpath сделать отдельной переменной на сервере. пользовательская папка из loginhandler
     private final Path USERPATH = Paths.get(".", "serverUsers", "user");
     private ByteBuf accumulator;
     private int fileNameLength;
     private String fileName;
-    private long fileLength;
     private State state = State.READTAG;
+    private long fileLength;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

@@ -3,7 +3,7 @@ package cloud.common;
 public enum Command {
     ADD("ADD"),
     UPGRADE("UPG"),
-    DOWNLOAD("DWN"),
+    DOWNLOAD("GET"),
     DELETE("DEL"),
     AUTH("ATH");
 

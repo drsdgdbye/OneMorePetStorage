@@ -25,13 +25,14 @@ public class StorageController {
     @FXML
     Button deleteLocalFile;
 
-    private final Path USERPATH = Paths.get(".", "users", "user"); //будет браться из login.getText()
+    private static Path UserPath = Paths.get(".", "users", "user"); //будет браться из login.getText()
 
     public void sendFile() throws IOException {
         String selectedLocalFileName = localStorageListView.getFocusModel().getFocusedItem();
         if (selectedLocalFileName != null) {
-            Path filePath = Paths.get(USERPATH.toString(), selectedLocalFileName);
+            Path filePath = Paths.get(UserPath.toString(), selectedLocalFileName);
             Network.sendFile(Command.ADD.getTag(), filePath.toFile());
+            System.out.println(Network.readStringMsg());
         } else {
             Alert alert = new Alert(Alert.AlertType.WARNING, "Choose File", ButtonType.OK);
             alert.showAndWait();
@@ -41,7 +42,7 @@ public class StorageController {
     public void updateLocalStorage() {
         try {
             localStorageListView.getItems().clear();
-            Files.walkFileTree(USERPATH, new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(UserPath, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     localStorageListView.getItems().add(file.getFileName().toString());
@@ -73,7 +74,7 @@ public class StorageController {
 
     public void deleteLocalFile() {
         String selectedLocalFileName = localStorageListView.getFocusModel().getFocusedItem();
-        Path deletePath = Paths.get(USERPATH.toString(), selectedLocalFileName);
+        Path deletePath = Paths.get(UserPath.toString(), selectedLocalFileName);
         try {
             Files.delete(deletePath);
             updateLocalStorage();
